@@ -34,6 +34,17 @@ server.get('/api/users', (req, res) => {
     });
 });
 
+server.get('/api/users/:id', (req, res) => {
+  const { id } = req.params;
+  db.findById(id)
+    .then(data => {
+      res.status(200).json(data);
+    })
+    .catch(() => {
+      res.status(404).json({ message: "The user with the specified ID does not exist." });
+    })
+});
+
 server.listen(5000, () => {
   console.log('Server listening on port 5000');
 });
