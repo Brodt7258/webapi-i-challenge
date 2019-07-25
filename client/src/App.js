@@ -30,9 +30,20 @@ const addUser = (user, state, setState) => {
     });
 };
 
+const updateUser = (id, user, state, setState) => {
+  axios.put(`${server}/${id}`, user)
+    .then(({ data }) => {
+      console.log(data);
+      const UserIndex = state.findIndex(e => e.id === id);
+      const newState = [ ...state ];
+      newState[UserIndex] = data;
+      setState(newState);
+    });
+}
+
 function App() {
   const [users, setUsers] = useState([]);
-  const [editing, setEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     bio: ''
@@ -50,20 +61,34 @@ function App() {
     });
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!editing) {
+    if (!editingId) {
       console.log('ADD');
       addUser(formData, users, setUsers);
     } else {
       console.log('EDIT');
+      updateUser(editingId, formData, users, setUsers);
     }
+  };
+
+  const handleEditing = ({ id, name, bio }) => {
+    setEditingId(id);
+    setFormData({ name, bio });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setFormData({
+      name: '',
+      bio: ''
+    });
   };
 
   return (
     <div className="App">
       <form onSubmit={handleSubmit}>
-        <h2>{editing ? 'Edit' : 'Add'} User</h2>
+        <h2>{editingId ? 'Edit' : 'Add'} User</h2>
         <label htmlFor="name">Name</label>
         <input
           id="name"
@@ -81,6 +106,11 @@ function App() {
           onChange={handleChange}
         />
         <button type="submit">Submit</button>
+        {editingId &&
+          <button onClick={cancelEdit}>
+            Cancel
+          </button>
+        }
       </form>
       <h2>Users</h2>
       <ul>
@@ -89,7 +119,7 @@ function App() {
             <li key={e.id}>
               <h3>{e.name}</h3>
               <p>{e.bio}</p>
-              <button>
+              <button onClick={() => handleEditing(e)}>
                 Edit
               </button>
               <button onClick={() => deleteUser(e.id, users, setUsers)}>
