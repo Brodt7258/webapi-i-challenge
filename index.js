@@ -24,6 +24,16 @@ server.post('/api/users', (req, res) => {
     });
 });
 
+server.get('/api/users', (req, res) => {
+  db.find()
+    .then(data => {
+      res.status(200).json(data);
+    })
+    .catch(() => {
+      res.status(500).json({ error: "The users information could not be retrieved." });
+    });
+});
+
 server.listen(5000, () => {
   console.log('Server listening on port 5000');
 });
