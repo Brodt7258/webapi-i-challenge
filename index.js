@@ -5,6 +5,7 @@ const server = express();
 const db = require('./data/db');
 
 server.use(express.json());
+server.use(cors());
 
 server.get('/', (req, res) => {
   res.send({ Success: 'test' });
